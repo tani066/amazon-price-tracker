@@ -14,7 +14,18 @@ export default function Home() {
   const fetchHistory = async (productId) => {
     try {
       const hist = await axios.get(`/api/history?id=${productId}`);
-      const sorted = hist.data.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      const sorted = hist.data
+      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+      .map((item) => ({
+        ...item,
+        formattedDate: new Date(item.createdAt).toLocaleString('en-IN', {
+          day: '2-digit',
+          month: 'short',
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+      }));
+    
       setHistory(sorted);
       setLastUpdated(new Date().toLocaleTimeString());
     } catch (error) {
@@ -89,14 +100,13 @@ export default function Home() {
         <div className="mt-8 bg-[#1f2937] p-4 rounded-lg shadow-inner">
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={history}>
-              <XAxis
-                dataKey="createdAt"
-                tickFormatter={(tick) => {
-                  const date = new Date(tick);
-                  return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
-                }}
-                stroke="#ccc"
-              />
+            <XAxis
+  dataKey="formattedDate"
+  stroke="#ccc"
+  interval="preserveStartEnd"
+  minTickGap={10}
+/>
+
               <YAxis stroke="#ccc" />
               <Tooltip
                 contentStyle={{ backgroundColor: '#111827', borderColor: '#4B5563', color: '#fff' }}
