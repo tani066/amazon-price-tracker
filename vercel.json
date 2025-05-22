@@ -1,8 +1,9 @@
 {
-    "cron": [
+    "version": 2,
+    "builds": [
       {
-        "path": "/api/update-prices",
-        "schedule": "*/30 * * * *"
+        "src": "next.config.js",
+        "use": "@vercel/next"
       }
     ]
   }
