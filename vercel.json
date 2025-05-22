@@ -1,3 +1,5 @@
 {
-  "buildCommand": "npx prisma generate && next build"
-}
+    "version": 2,
+    "buildCommand": "npx prisma generate && next build"
+  }
+  
