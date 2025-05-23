@@ -10,7 +10,6 @@ export default function Home() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
-  
 
   const fetchHistory = async (productId) => {
     try {
@@ -33,19 +32,24 @@ export default function Home() {
       console.error('Error fetching history:', error);
     }
   };
-
+  
   const handleSubmit = async () => {
     setLoading(true);
+  
     try {
       const res = await axios.post('/api/track', { url });
-      setProduct(res.data.product);
-      await fetchHistory(res.data.product.id);
+      const productData = res.data.product;
+      
+      setProduct(productData);
+      await fetchHistory(productData.id);
+
     } catch (error) {
       console.error('Tracking failed:', error);
     } finally {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     if (!product) return;
@@ -118,7 +122,12 @@ export default function Home() {
               <ReferenceLine y={minPrice} label={{ value: `Lowest: ₹${minPrice}`, position: 'right', fill: '#60a5fa' }} stroke="#60a5fa" strokeDasharray="3 3" />
               <ReferenceLine y={parseFloat(avgPrice)} label={{ value: `Average: ₹${avgPrice}`, position: 'right', fill: '#facc15' }} stroke="#facc15" strokeDasharray="3 3" />
             </LineChart>
+
+
+
           </ResponsiveContainer>
+
+          
         </div>
       )}
 
