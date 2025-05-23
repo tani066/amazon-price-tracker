@@ -5,10 +5,10 @@ async function scrapeAmazon(url) {
     const response = await axios.post(
       `https://chrome.browserless.io/content?token=${process.env.BROWSERLESS_TOKEN}`,
       {
-        url: url,
+        url,
         elements: [
           { selector: '#productTitle', type: 'text' },
-          { selector: '#landingImage', type: 'src' },
+          { selector: '#landingImage, #imgTagWrapperId img', type: 'src' },
           {
             selector: [
               '#priceblock_ourprice',
@@ -32,7 +32,7 @@ async function scrapeAmazon(url) {
       }
     );
 
-    const data = response.data.data;
+    const data = response.data?.data || [];
 
     const title = data[0]?.result || 'No title';
     const image = data[1]?.result || '';
@@ -43,7 +43,7 @@ async function scrapeAmazon(url) {
 
     return { title, image, price };
   } catch (err) {
-    console.error('Browserless scraping error:', err.message);
+    console.error('Browserless scraping error:', err.response?.data || err.message);
     throw new Error('Failed to scrape product from Amazon.');
   }
 }

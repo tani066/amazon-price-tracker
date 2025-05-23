@@ -1,7 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import scrapeAmazon from '@/utils/scrapeAmazon';
 
-
 const prisma = new PrismaClient();
 
 export async function POST(req) {
@@ -9,16 +8,21 @@ export async function POST(req) {
     const body = await req.json();
     const { url } = body;
 
-    const existing = await prisma.product.findUnique({ where: { url } });
+    const asinMatch = url.match(/(?:dp|gp\/product)\/([A-Z0-9]{10})/);
+    if (!asinMatch) throw new Error('Invalid Amazon URL');
+    const cleanUrl = `https://www.amazon.in/dp/${asinMatch[1]}`;
+
+    const existing = await prisma.product.findUnique({ where: { url: cleanUrl } });
     if (existing) {
-      return Response.json({ product: existing });
+      const priceHistory = await prisma.priceHistory.findMany({ where: { productId: existing.id } });
+      return Response.json({ product: existing, priceHistory });
     }
 
-    const data = await scrapeAmazon(url);
+    const data = await scrapeAmazon(cleanUrl);
 
     const product = await prisma.product.create({
       data: {
-        url,
+        url: cleanUrl,
         title: data.title,
         image: data.image,
         platform: 'Amazon',

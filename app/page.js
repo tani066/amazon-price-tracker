@@ -10,7 +10,7 @@ export default function Home() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
-
+  
   const fetchHistory = async (productId) => {
     try {
       const hist = await axios.get(`/api/history?id=${productId}`);
